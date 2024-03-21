@@ -23,6 +23,7 @@ One extra feature I have added is the ability to automatically have the positive
 - If there is no such file either then it will look for a default.txt in the path you have set as the main image source folder
 - If it finds a TXT file then the contents of it will be appended to the positive prompt
 - There is one more checkbox that can be activated to make it so the prompt in your UI will be ignored entirely when a TXT file is loaded like this
+
 As you can probably tell, this functionality can be used to fine-tune your prompt for better or more consistent results despite the ControlNet image being selected randomly.
 
 ## Known issues and limitations
