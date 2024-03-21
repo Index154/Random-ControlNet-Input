@@ -92,7 +92,7 @@ class Script(scripts.Script):
                 loadedTxt = readTxt(mainDefaultPath)
                 
             if(loadedTxt != ''):
-                p.prompt += " "
+                p.prompt += ", "
                 if uiIgnorePrompt : p.prompt = ''
                 p.prompt += loadedTxt
         
