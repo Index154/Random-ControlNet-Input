@@ -24,8 +24,6 @@ TXT files can be used to add extra keywords to your prompt based on the image th
 - If it finds a TXT file then the contents of it will be appended to the positive prompt
 - There is one more checkbox that can be activated to make it so the prompt in your UI will be ignored entirely when a TXT file is loaded like this
 
-As you can probably tell, this functionality can be used to fine-tune your prompt for better or more consistent results despite the ControlNet image being selected randomly.
-
 You can define string substitutions for the positive prompt with the following syntax: `!replace:stringA=>stringB!` If you put this into your prompt then any occurrence of stringA will be replaced with stringB in the final prompt. This functionality works even if your UI prompt is set to be ignored through the corresponding checkbox option. The reason I added this feature is to make quick and temporary changes to the prompts defined in the TXT files a little bit easier.
 
 ## Known issues and limitations
