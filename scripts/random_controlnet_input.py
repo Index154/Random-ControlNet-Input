@@ -74,7 +74,13 @@ class Script(scripts.Script):
             except:
                 raise Exception("<Random Controlnet Input> - Failed to read txt file " + txtPath)
             return txtContent
-            
+        
+        # Get substitution strings from prompt and remove them
+        import re
+        pattern = r'!replace:.*?=>.*?!'
+        replaces = re.findall(pattern, p.prompt)
+        p.prompt = re.sub(pattern, '', p.prompt)
+        
         # Add text from txt file with same filename to prompt if enabled. If no file is found, look for default.txt in the same folder. Also check in the main folder entered by the user if necessary
         if(uiModifyPrompt):
             txtPath = imgPath[:-4] + '.txt'
@@ -95,6 +101,13 @@ class Script(scripts.Script):
                 p.prompt += ", "
                 if uiIgnorePrompt : p.prompt = ''
                 p.prompt += loadedTxt
+                for replace in replaces:
+                    if(replace is not None):
+                        parts = replace[9:].split('=>')
+                        if(len(parts) > 2):
+                            raise Exception("Each replace function may only contain one occurrence of =>")
+                        else:
+                            p.prompt = p.prompt.replace(parts[0], parts[1][:-1])
         
         # Change the controlnet input image to the selected one
         controlNetList[0].image = imgData
