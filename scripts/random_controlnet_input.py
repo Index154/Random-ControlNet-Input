@@ -104,7 +104,7 @@ class Script(scripts.Script):
             if len(f['images']) < 1 : raise Exception("<Random Controlnet Input> - The custom weight for \"" + f['name'] + "\" is affecting no images! Please check for typos")
         print('')
         
-        # Select a random image and convert it
+       # Select a random image and convert it
         roll = random.randrange(1, totalWeight + 1)
         selectedImg = ''
         weightCheck = 0
@@ -114,6 +114,7 @@ class Script(scripts.Script):
             if(roll <= weightCheck):
                 if (len(folders[i]['images']) > 0):
                     selectedImg = random.choice(folders[i]['images'])
+            i += 1
         
         # Load image
         try:
