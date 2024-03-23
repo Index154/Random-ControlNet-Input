@@ -15,9 +15,10 @@ class Script(scripts.Script):
         uiFolderRandom = gr.Checkbox(True, label="Randomize by direct subfolder")
         uiModifyPrompt = gr.Checkbox(True, label="Dynamic prompt additions with TXT files")
         uiIgnorePrompt = gr.Checkbox(False, label="Replace positive UI prompt with TXT contents")
-        return [uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt, uiFolderRandom]
+        uiForceControlNet = gr.Checkbox(False, label="Force-enable ControlNet Unit 0")
+        return [uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt, uiFolderRandom, uiForceControlNet]
 
-    def run(self, p, uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt, uiFolderRandom):
+    def run(self, p, uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt, uiFolderRandom, uiForceControlNet):
     
         # Abort if the script is inactive
         if(not uiActive):
@@ -39,10 +40,11 @@ class Script(scripts.Script):
         import importlib
         controlNetModule = importlib.import_module('extensions.sd-webui-controlnet.scripts.external_code', 'external_code')
         
-        # Abort if ControlNet is turned off
+        # Enable ControlNet if turned off
         controlNetList = controlNetModule.get_all_units_in_processing(p)
         if(not controlNetList[0].enabled):
-            return
+            if uiForceControlNet : controlNetList[0].enabled = True
+            else: return
         
         # Get list of files in folder
         if(uiRecursive):
@@ -104,7 +106,7 @@ class Script(scripts.Script):
             if len(f['images']) < 1 : raise Exception("<Random Controlnet Input> - The custom weight for \"" + f['name'] + "\" is affecting no images! Please check for typos")
         print('')
         
-       # Select a random image and convert it
+        # Select a random image and convert it
         roll = random.randrange(1, totalWeight + 1)
         selectedImg = ''
         weightCheck = 0
