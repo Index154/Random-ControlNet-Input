@@ -8,16 +8,16 @@ class Script(scripts.Script):
     def title(self):
         return "Random ControlNet Input"
 
-
     def ui(self, is_img2img):
         uiActive = gr.Checkbox(True, label="Activate script")
         uiFolderPath = gr.Textbox(label="Image source folder", lines=1)
         uiRecursive = gr.Checkbox(True, label="Include subfolders")
-        uiModifyPrompt = gr.Checkbox(False, label="Add contents of txt file with same filename as the selected image to positive prompt (If no matching txt is found the script will look for a default.txt in the same folder and in the image source folder)")
-        uiIgnorePrompt = gr.Checkbox(True, label="Ignore the positive prompt in WebUI if a txt file is used")
-        return [uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt]
+        uiFolderRandom = gr.Checkbox(True, label="Randomize by direct subfolder")
+        uiModifyPrompt = gr.Checkbox(True, label="Dynamic prompt additions with TXT files")
+        uiIgnorePrompt = gr.Checkbox(False, label="Replace positive UI prompt with TXT contents")
+        return [uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt, uiFolderRandom]
 
-    def run(self, p, uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt):
+    def run(self, p, uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt, uiFolderRandom):
     
         # Abort if the script is inactive
         if(not uiActive):
@@ -25,12 +25,12 @@ class Script(scripts.Script):
         
         # Error if there is no path supplied
         if(uiFolderPath == ""):
-            raise Exception("<Random Controlnet Input> - Please enter an image source folder path")
+            raise Exception("<Random ControlNet Input> - Please enter an image source folder path")
             return
         
         # Error if folder does not exist
         if(not os.path.isdir(uiFolderPath)):
-            raise Exception("<Random Controlnet Input> - Image source folder not found")
+            raise Exception("<Random ControlNet Input> - Image source folder not found")
         
         # Additional imports
         import glob
@@ -53,17 +53,74 @@ class Script(scripts.Script):
         
         # Error if there are no files
         if(len(files) < 1):
-            raise Exception("<Random Controlnet Input> - No png files found in image source folder")
+            raise Exception("<Random ControlNet Input> - No PNG files found in image source folder")
             return
         
+        # Get substitution strings from prompt and remove them
+        import re
+        pattern = r'!.*?=>.*?!'
+        replaces = re.findall(pattern, p.prompt)
+        p.prompt = re.sub(pattern, '', p.prompt)
+        separator = os.path.join('a', 'a')[1:2]
+        
+        # Get custom file / folder weights from prompt
+        pattern = r'!.*?=.*?!'
+        weights = re.findall(pattern, p.prompt)
+        p.prompt = re.sub(pattern, '', p.prompt)
+        folders = []
+        totalWeight = 0
+        for weight in weights:
+            weightSplit = weight[1:-1].split('=')
+            weightSplit[1] = max(1, int(weightSplit[1]))    # Minimal value of 1
+            totalWeight += weightSplit[1]
+            newWeight = {'name': weightSplit[0], 'value': weightSplit[1], 'images': []}
+            folders.append(newWeight)
+            
+        # Assign every image to a folder / filename pool
+        for f in files:
+            f2 = f.replace(uiFolderPath, '').replace(separator + separator, separator)
+            f2 = f2.split(separator)
+            assigned = False
+            if not uiFolderRandom : f2[1] = 'unassigned'   # If uiFolderRandom is turned off, assign all images not matching a custom weight pool to one shared pool called unassigned
+            for index, folder in enumerate(folders):
+                i = len(f2) - 1
+                while i > 0:
+                    if(f2[i] == folder['name']):
+                        folders[index]['images'].append(f)
+                        assigned = True
+                        break
+                    i -= 1
+            # If an image could not be assigned to a folder, create a new folder weight for the highest level directory of its path, excluding the main path entered by the user
+            if(not assigned):
+                totalWeight += 1
+                newWeight = {'name': f2[1], 'value': 1, 'images': [f]}
+                folders.append(newWeight)
+        
+        # Log folder / file weights and remove 0 image sets
+        print('')
+        print('<Random ControlNet Input> - Folder and file name weights:')
+        for f in folders:
+            print('    ' + f['name'] + ': Weight = ' + str(f['value']) + ' & image count = ' + str(len(f['images'])))
+            if len(f['images']) < 1 : raise Exception("<Random Controlnet Input> - The custom weight for \"" + f['name'] + "\" is affecting no images! Please check for typos")
+        print('')
+        
         # Select a random image and convert it
-        imgName = random.choice(files)
-        imgPath = os.path.join(uiFolderPath, imgName)
+        roll = random.randrange(1, totalWeight + 1)
+        selectedImg = ''
+        weightCheck = 0
+        i = 0
+        while i < len(folders) and selectedImg == '':
+            weightCheck += folders[i]['value']
+            if(roll <= weightCheck):
+                if (len(folders[i]['images']) > 0):
+                    selectedImg = random.choice(folders[i]['images'])
+        
+        # Load image
         try:
-            with open(imgPath, "rb") as imageFile:
+            with open(selectedImg, "rb") as imageFile:
                 imgData = controlNetModule.to_base64_nparray(base64.b64encode(imageFile.read()).decode())
         except:
-            raise Exception("<Random Controlnet Input> - Error loading the image file " + imgName)
+            raise Exception("<Random Controlnet Input> - Failed to read image file " + selectedImg)
             return
             
         # Function for txt file reading
@@ -72,42 +129,41 @@ class Script(scripts.Script):
                 with open(txtPath, 'r') as txtFile:
                     txtContent = txtFile.read().replace('\n', '')
             except:
-                raise Exception("<Random Controlnet Input> - Failed to read txt file " + txtPath)
+                raise Exception("<Random Controlnet Input> - Failed to read text file " + txtPath)
             return txtContent
         
-        # Get substitution strings from prompt and remove them
-        import re
-        pattern = r'!replace:.*?=>.*?!'
-        replaces = re.findall(pattern, p.prompt)
-        p.prompt = re.sub(pattern, '', p.prompt)
-        
-        # Add text from txt file with same filename to prompt if enabled. If no file is found, look for default.txt in the same folder. Also check in the main folder entered by the user if necessary
-        if(uiModifyPrompt):
-            txtPath = imgPath[:-4] + '.txt'
-            separator = os.path.join('a', 'a')[1:2]
+        # Function for loading default.txt
+        def getDefault(txtPath):
             splitTxtPath = txtPath.split(separator)
-            defaultPath = os.path.join(separator.join(splitTxtPath[:-1]), "default.txt")
             mainDefaultPath = os.path.join(uiFolderPath, 'default.txt')
             
+            loaded = ''
+            index = -1
+            while index < len(splitTxtPath) and loaded == '':
+                path = os.path.join(separator.join(splitTxtPath[:index]), "default.txt")
+                if os.path.isfile(path): loaded = readTxt(path)
+                if path == mainDefaultPath : break
+                index -= 1
+            return loaded
+        
+        # Add text from txt file with same filename to prompt if enabled. If no file is found, look for default.txt in the same folder and in the main folder entered by the user
+        if(uiModifyPrompt):
+            txtPath = selectedImg[:-4] + '.txt'
             loadedTxt = ''
             if(os.path.isfile(txtPath)):
                 loadedTxt = readTxt(txtPath)
-            elif(os.path.isfile(defaultPath)):
-                loadedTxt = readTxt(defaultPath)
-            elif(mainDefaultPath != defaultPath and os.path.isfile(mainDefaultPath)):
-                loadedTxt = readTxt(mainDefaultPath)
+            else:
+                loadedTxt = getDefault(txtPath)
                 
             if(loadedTxt != ''):
                 p.prompt += ", "
                 if uiIgnorePrompt : p.prompt = ''
                 p.prompt += loadedTxt
+                if '{default}' in p.prompt : p.prompt = p.prompt.replace('{default}', getDefault(txtPath))  # Replace {default} with contents from default.txt
                 for replace in replaces:
                     if(replace is not None):
-                        parts = replace[9:].split('=>')
-                        if(len(parts) > 2):
-                            raise Exception("Each replace function may only contain one occurrence of =>")
-                        else:
-                            p.prompt = p.prompt.replace(parts[0], parts[1][:-1])
+                        parts = replace[1:-1].split('=>')
+                        p.prompt = p.prompt.replace(parts[0], '=>'.join(parts[1:]))
         
         # Change the controlnet input image to the selected one
         controlNetList[0].image = imgData
