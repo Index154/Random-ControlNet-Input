@@ -48,7 +48,7 @@ You can define custom weights for subfolders or for specific filenames by includ
 
 If you define custom weights for any folder or filename then all images with that name or in that folder (or its subfolders) will be added to this custom pool. File names have the highest priority for weight pool matching. Lower level folders will take precedence over ones higher in the tree. Currently if you have any folders with the same names then there is no way of distinguishing between them using this syntax.
 
-The custom weight syntax will be removed from the prompt before generation begins.
+The custom weight syntax will be removed from your prompt before generation begins.
 
 
 ## Known issues and limitations
