@@ -51,11 +51,15 @@ If you define custom weights for any folder or filename then all images with tha
 The custom weight syntax will be removed from your prompt before generation begins.
 
 
-## Known issues and limitations
+## Known issues & limitations
 - I don't know how to make ControlNet use a different input image for each batch
 - For now I have not bothered to add support for multiple ControlNet units or even just selecting a specific unit. I will consider it if anyone asks for it
 - It only looks for and loads PNG files for now because I had no need for other file types
 - Custom weights can not differentiate between folders and files with the same name even if they have different parent folders
+
+
+## Planned features & changes
+- A 50% chance for the input image to be flipped horizontally and a checkbox for turning this feature off
 
 
 ## Recommended extensions
