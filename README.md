@@ -3,11 +3,11 @@ A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/st
 
 
 ## Installation
-Put random_controlnet_input.py into the scripts folder of Stable Diffusion WebUI. Then reload the UI or restart the whole application.
-
-
-## Prerequisites
-You will need to have the [ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet) installed for this to work.
+1. Install the [ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet) extension
+2. In the WebUI navigate to: Extensions -> Install from URL
+4. Paste this link into the "URL for extension's git repository" box: https://github.com/Index154/Random-ControlNet-Input
+5. Click on Install
+6. Select the "Installed" tab and click on "Apply and restart UI"
 
 
 ## Basic usage
