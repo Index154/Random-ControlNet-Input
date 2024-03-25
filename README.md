@@ -3,7 +3,7 @@ A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/st
 
 
 ## Installation
-1. Install the [ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet) extension
+1. Install the [ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet)
 2. In the WebUI navigate to: Extensions -> Install from URL
 4. Paste this link into the "URL for extension's git repository" box: https://github.com/Index154/Random-ControlNet-Input
 5. Click on Install
