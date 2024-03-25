@@ -73,6 +73,6 @@ There is a checkbox you can enable so unit 0 of ControlNet will always be enable
 
 ## Recommended extensions
 - [Dynamic Prompts](https://github.com/adieyal/sd-dynamic-prompts) for randomization of prompt contents
-- [Style Vars](https://github.com/SirVeggie/extension-style-vars) for assigning styles conditionally (either through the TXT files or dynamic prompting). Great for quick substitutions.
+- [Style Vars](https://github.com/SirVeggie/extension-style-vars) for assigning styles conditionally (either through the TXT files or dynamic prompting). Great for quick substitutions
 
 The changes made to the prompt by these extensions are applied AFTER those made by this script!
