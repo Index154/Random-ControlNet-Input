@@ -15,7 +15,7 @@ A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/st
 2. Select "Random ControlNet Input"
 3. Paste the path to a folder with png files in it into the "Image source folder" input box
 4. Enable ControlNet Unit 0 and adjust its settings to your liking. You do not need to select an image for it manually at any point
-5. When you click "Generate" the script will select a random png file from the folder as the ControlNet Unit 0 input (it will not be displayed in the ControlNet UI)
+5. When you click "Generate" the script will select a random PNG file from the folder as the ControlNet Unit 0 input (it will not be displayed in the ControlNet UI)
 
 
 ## Extra details and special features
