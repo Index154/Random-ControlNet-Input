@@ -19,6 +19,8 @@ A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/st
 
 
 ## Extra details and special features
+All available settings for the script are found directly below the Script selector in the WebUI after selecting the script.
+
 ### Recursive file scan
 PNG files in all subfolders of your defined source folder are included in the random selection by default. This can be turned off with a checkbox.
 
