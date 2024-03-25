@@ -77,7 +77,8 @@ class Script(scripts.Script):
         totalWeight = 0
         for weight in weights:
             weightSplit = weight[1:-1].split('=')
-            weightSplit[1] = max(1, int(weightSplit[1]))    # Minimal value of 1
+            weightSplit[1] = int(weightSplit[1])
+            if weightSplit[1] < 1 : weightSplit[1] = 1
             totalWeight += weightSplit[1]
             newWeight = {'name': weightSplit[0], 'value': weightSplit[1], 'images': []}
             folders.append(newWeight)
