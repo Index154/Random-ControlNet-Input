@@ -3,7 +3,7 @@ A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/st
 
 
 ## Installation
-Put the script into the scripts folder of Stable Diffusion WebUI. Then reload the UI or restart the whole application.
+Put random_controlnet_input.py into the scripts folder of Stable Diffusion WebUI. Then reload the UI or restart the whole application.
 
 
 ## Prerequisites
