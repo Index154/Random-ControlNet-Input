@@ -69,7 +69,7 @@ class Script(scripts.Script):
         p.prompt = re.sub(pattern, '', p.prompt)
         separator = os.path.join('a', 'a')[1:2]
         
-        # Get custom file / folder weights from prompt
+        # Get custom weight pools from prompt and remove them
         pattern = r'!.*?=.*?!'
         weights = re.findall(pattern, p.prompt)
         p.prompt = re.sub(pattern, '', p.prompt)
@@ -83,7 +83,7 @@ class Script(scripts.Script):
             newWeight = {'name': weightSplit[0], 'value': weightSplit[1], 'images': []}
             folders.append(newWeight)
             
-        # Assign every image to a folder / filename pool
+        # Assign every image to a weight pool
         for f in files:
             f2 = f.replace(uiFolderPath, '').replace(separator + separator, separator)
             f2 = f2.split(separator)
@@ -93,12 +93,12 @@ class Script(scripts.Script):
                 i = len(f2) - 1
                 while i > 0:
                     if(uiRegex):
-                        if(re.match(folder['name'], f2[i]) is not None):
+                        if(re.match(folder['name'].lower(), f2[i].lower()) is not None):
                             folders[index]['images'].append(f)
                             assigned = True
                             break
                     else:
-                        if(f2[i] == folder['name']):
+                        if(f2[i].lower() == folder['name'].lower()):
                             folders[index]['images'].append(f)
                             assigned = True
                             break
@@ -109,9 +109,9 @@ class Script(scripts.Script):
                 newWeight = {'name': f2[1], 'value': 1, 'images': [f]}
                 folders.append(newWeight)
         
-        # Log folder / file weights and remove empty pools
+        # Log all weight pools and remove empty pools
         print('')
-        print('<Random ControlNet Input> - Folder and file name weights:')
+        print('<Random ControlNet Input> - Weight pools:')
         for f in folders:
             print('    ' + f['name'] + ': Weight = ' + str(f['value']) + ' & image count = ' + str(len(f['images'])))
             if len(f['images']) < 1 : raise Exception("<Random Controlnet Input> - The custom weight for \"" + f['name'] + "\" is affecting no images! Please check for typos")
@@ -129,6 +129,7 @@ class Script(scripts.Script):
                 if (len(folders[i]['images']) > 0):
                     selectedImg = random.choice(folders[i]['images'])
             i += 1
+        if selectedImg == '' : raise Exception("<Random Controlnet Input> - The randomization ended without a chosen image even though other checks should have prevented this from happening. Please test the reproducability of this and report the issue")
         
         # Load image
         from PIL import Image
