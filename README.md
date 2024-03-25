@@ -43,13 +43,13 @@ You can use the string {default} to force the script to include the contents of 
 You can define string substitutions for the positive prompt with the following syntax: `!stringA=>stringB!` - If you put this into your positive prompt then any occurrence of stringA will be replaced with stringB in the final positive prompt. This feature is useful for making quick and temporary changes to the prompts defined in the TXT files. All string substitution syntax will be removed from the prompt before any images are generated.
 
 ### Randomize by direct subfolder
-The default behavior of the script is to assign all images to the top-level folder they are in (the direct subfolders of the path you define in the UI). Each folder is given an equal weight of 1 to be selected in the randomization process. A completely random image from within that folder (or its subfolders) is then selected.
+The default behavior of the script is to assign all images to the top-level folder they are in (the direct subfolders of the path you define in the UI). Each folder is given an equal weight of 1 to be selected in the randomization process. Images placed directly in the main folder are assigned a weight of 1 each just like the folders. A completely random image from within the chosen folder (and all of its subfolders) is then selected.
 
 You can change this behavior by either turning off the folder-based randomization completely or by assigning custom weights to folders / files (see below). If you turn off the randomization by subfolder then all images will have an equal chance of being selected.
 
 ### Custom folder / file weights
 You can define custom weights for subfolders or for specific filenames by including a special syntax in your positive prompt. Examples:
-- `!favorites=4!` = The folder named favorites will have a weight of 4
+- `!favorites=4!` = All folders named favorites will have a weight of 4
 - `!standing, from above.png=999!` = *All files* with the name "standing, from above.png" will have a weight of 999
 
 If you define custom weights for any folder or filename then all images with that name or in that folder (or its subfolders) will be added to this custom "pool". File names have the highest priority for weight pool matching. Lower level folders will take precedence over ones higher in the tree. Currently if you have any folders with the same names then there is no way of distinguishing between them using this syntax.
