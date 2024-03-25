@@ -1,5 +1,5 @@
 # Random-ControlNet-Input
-A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui). When enabled, chooses a random ControlNet input image from a custom folder path when you start the generation process.
+A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui). When enabled, chooses a random input image for ControlNet unit 0 from a custom folder path when you start the generation process.
 
 
 ## Installation
