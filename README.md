@@ -22,6 +22,9 @@ You will need to have the [ControlNet extension](https://github.com/Mikubill/sd-
 ### Recursive file scan
 PNG files in all subfolders of your defined source folder are included in the random selection by default. This can be turned off with a checkbox.
 
+### Random horizontal flipping
+There is a 50% chance for the input image to be flipped horizontally. You can disable this feature.
+
 ### Dynamic prompt additions with TXT files
 TXT files can be used to add extra text to your prompt based on which image was randomly selected. This can be turned off with a checkbox. It works like this:
 - The script looks for a TXT file with the same name as the PNG file that was selected. It will only look for this file in the folder the image is in
@@ -46,7 +49,9 @@ You can define custom weights for subfolders or for specific filenames by includ
 - `!favorites=4!` = The folder named favorites will have a weight of 4
 - `!standing, from above.png=999!` = *All files* with the name "standing, from above.png" will have a weight of 999
 
-If you define custom weights for any folder or filename then all images with that name or in that folder (or its subfolders) will be added to this custom pool. File names have the highest priority for weight pool matching. Lower level folders will take precedence over ones higher in the tree. Currently if you have any folders with the same names then there is no way of distinguishing between them using this syntax.
+If you define custom weights for any folder or filename then all images with that name or in that folder (or its subfolders) will be added to this custom "pool". File names have the highest priority for weight pool matching. Lower level folders will take precedence over ones higher in the tree. Currently if you have any folders with the same names then there is no way of distinguishing between them using this syntax.
+
+You can enable a setting to make the script treat your custom weight names as regular expressions. With this feature turned on the image files will be assigned to a weight pool if their names or their parent folder names match the given expression.
 
 The custom weight syntax will be removed from your prompt before generation begins.
 
