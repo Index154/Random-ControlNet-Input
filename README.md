@@ -54,12 +54,13 @@ You can define custom weights for subfolders or for specific filenames by includ
 
 If you define custom weights for any folder or filename then all images with that name or in that folder (or its subfolders) will be added to this custom "pool". File names have the highest priority for weight pool matching. Lower level folders will take precedence over ones higher in the tree. Currently if you have any folders with the same names then there is no way of distinguishing between them using this syntax.
 
-You can enable a setting to make the script treat your custom weight names as regular expressions. With this feature turned on the image files will be assigned to a weight pool if their names or their parent folder names match the given expression.
+You can enable a setting to make the script treat your custom weight names as regular expressions. With this feature turned on the image files will be assigned to a weight pool if their names or their parent folder names match the given expression. Example expression:
+- `!.*from below.*=20!` = Any file with "from below" in its name will be assigned to this pool. The same goes for files inside folders with names that match the expression
 
 The custom weight syntax will be removed from your prompt before generation begins.
 
 ### Force-enable ControlNet
-There is a checkbox you can enable so unit 0 of ControlNet will always be enabled automatically at runtime when you generate images. This can be useful since having ControlNet be turned on by default through ui-config.json seemed to not work when I tried it.
+There is a checkbox you can enable so unit 0 of ControlNet will always be enabled automatically at runtime when you generate images as long as the script is active. This can be useful since having ControlNet be turned on by default through ui-config.json seemed to not work when I tried it.
 
 
 ## Known issues & limitations
