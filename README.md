@@ -55,16 +55,15 @@ You can enable a setting to make the script treat your custom weight names as re
 
 The custom weight syntax will be removed from your prompt before generation begins.
 
+### Force-enable ControlNet
+There is a checkbox you can enable so unit 0 of ControlNet will always be enabled automatically at runtime when you generate images. This can be useful since having ControlNet be turned on by default through ui-config.json seemed to not work when I tried it.
+
 
 ## Known issues & limitations
 - I don't know how to make ControlNet use a different input image for each batch
 - For now I have not bothered to add support for multiple ControlNet units or even just selecting a specific unit. I will consider it if anyone asks for it
 - It only looks for and loads PNG files for now because I had no need for other file types
 - Custom weights can not differentiate between folders and files with the same name even if they have different parent folders
-
-
-## Planned features & changes
-- A 50% chance for the input image to be flipped horizontally and a checkbox for turning this feature off
 
 
 ## Recommended extensions
