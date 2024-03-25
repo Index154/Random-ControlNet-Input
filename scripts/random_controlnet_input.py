@@ -26,6 +26,14 @@ class Script(scripts.Script):
         if(not uiActive):
             return
         
+        # Error if controlnet is missing
+        import importlib
+        try:
+            controlNetModule = importlib.import_module('extensions.sd-webui-controlnet.scripts.external_code', 'external_code')
+        except:
+            raise Exception("<Random ControlNet Input> - ControlNet extension not found!")
+            return
+        
         # Error if there is no path supplied
         if(uiFolderPath == ""):
             raise Exception("<Random ControlNet Input> - Please enter an image source folder path")
@@ -35,13 +43,6 @@ class Script(scripts.Script):
         if(not os.path.isdir(uiFolderPath)):
             raise Exception("<Random ControlNet Input> - Image source folder not found")
         
-        # Additional imports
-        import glob
-        import base64
-        import random
-        import importlib
-        controlNetModule = importlib.import_module('extensions.sd-webui-controlnet.scripts.external_code', 'external_code')
-        
         # Enable ControlNet if turned off
         controlNetList = controlNetModule.get_all_units_in_processing(p)
         if(not controlNetList[0].enabled):
@@ -49,6 +50,7 @@ class Script(scripts.Script):
             else: return
         
         # Get list of files in folder
+        import glob
         if(uiRecursive):
             searchPath = os.path.join(uiFolderPath, '**', '*.png')
         else:
@@ -100,13 +102,13 @@ class Script(scripts.Script):
                             assigned = True
                             break
                     i -= 1
-            # If an image could not be assigned to a folder, create a new folder weight for the highest level directory of its path, excluding the main path entered by the user
+            # If an image could not be assigned to a pool, create a new folder weight for the highest level directory of its path, excluding the main path entered by the user
             if(not assigned):
                 totalWeight += 1
                 newWeight = {'name': f2[1], 'value': 1, 'images': [f]}
                 folders.append(newWeight)
         
-        # Log folder / file weights and remove 0 image sets
+        # Log folder / file weights and remove empty pools
         print('')
         print('<Random ControlNet Input> - Folder and file name weights:')
         for f in folders:
@@ -114,7 +116,8 @@ class Script(scripts.Script):
             if len(f['images']) < 1 : raise Exception("<Random Controlnet Input> - The custom weight for \"" + f['name'] + "\" is affecting no images! Please check for typos")
         print('')
         
-        # Select a random image and convert it
+        # Select a random image
+        import random
         roll = random.randrange(1, totalWeight + 1)
         selectedImg = ''
         weightCheck = 0
@@ -129,6 +132,7 @@ class Script(scripts.Script):
         # Load image
         from PIL import Image
         from io import BytesIO
+        import base64
         try:
             with Image.open(selectedImg) as img:
                 if uiFlip and random.choice([True, False]) : img = img.transpose(Image.FLIP_LEFT_RIGHT)
