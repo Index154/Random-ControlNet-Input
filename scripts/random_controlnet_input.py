@@ -13,12 +13,14 @@ class Script(scripts.Script):
         uiFolderPath = gr.Textbox(label="Image source folder", lines=1)
         uiRecursive = gr.Checkbox(True, label="Include subfolders")
         uiFolderRandom = gr.Checkbox(True, label="Randomize by direct subfolder")
+        uiFlip = gr.Checkbox(True, label="Flip input image horizontally 50% of the time")
         uiModifyPrompt = gr.Checkbox(True, label="Dynamic prompt additions with TXT files")
         uiIgnorePrompt = gr.Checkbox(False, label="Replace positive UI prompt with TXT contents")
+        uiRegex = gr.Checkbox(False, label="Read custom weight names as regular expressions")
         uiForceControlNet = gr.Checkbox(False, label="Force-enable ControlNet Unit 0")
-        return [uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt, uiFolderRandom, uiForceControlNet]
+        return [uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt, uiFolderRandom, uiForceControlNet, uiFlip, uiRegex]
 
-    def run(self, p, uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt, uiFolderRandom, uiForceControlNet):
+    def run(self, p, uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt, uiFolderRandom, uiForceControlNet, uiFlip, uiRegex):
     
         # Abort if the script is inactive
         if(not uiActive):
@@ -87,10 +89,16 @@ class Script(scripts.Script):
             for index, folder in enumerate(folders):
                 i = len(f2) - 1
                 while i > 0:
-                    if(f2[i] == folder['name']):
-                        folders[index]['images'].append(f)
-                        assigned = True
-                        break
+                    if(uiRegex):
+                        if(re.match(folder['name'], f2[i]) is not None):
+                            folders[index]['images'].append(f)
+                            assigned = True
+                            break
+                    else:
+                        if(f2[i] == folder['name']):
+                            folders[index]['images'].append(f)
+                            assigned = True
+                            break
                     i -= 1
             # If an image could not be assigned to a folder, create a new folder weight for the highest level directory of its path, excluding the main path entered by the user
             if(not assigned):
@@ -119,9 +127,14 @@ class Script(scripts.Script):
             i += 1
         
         # Load image
+        from PIL import Image
+        from io import BytesIO
         try:
-            with open(selectedImg, "rb") as imageFile:
-                imgData = controlNetModule.to_base64_nparray(base64.b64encode(imageFile.read()).decode())
+            with Image.open(selectedImg) as img:
+                if uiFlip and random.choice([True, False]) : img = img.transpose(Image.FLIP_LEFT_RIGHT)
+                io = BytesIO()
+                img.save(io, format='PNG')
+                imgData = controlNetModule.to_base64_nparray(base64.b64encode(io.getvalue()).decode())
         except:
             raise Exception("<Random Controlnet Input> - Failed to read image file " + selectedImg)
             return
