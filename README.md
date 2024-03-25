@@ -1,5 +1,5 @@
 # Random ControlNet Input
-A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui). When enabled, chooses a random input image for ControlNet unit 0 from a custom folder path every time you start a generation process. With additional features such as dynamic prompt modifications for the positive prompt, randomzied flipping of the input image and custom weights for select subfolders or files.
+A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui). When enabled chooses a random input image for ControlNet unit 0 from a custom folder path every time you start a generation process. With additional features such as dynamic prompt modifications for the positive prompt, randomzied flipping of the input image and custom weights for select subfolders or files.
 
 
 ## Installation
@@ -11,7 +11,7 @@ A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/st
 
 
 ## Basic usage
-1. On the txt2img or img2img tab, scroll down to find the script selector
+1. On the txt2img or img2img tab scroll down to find the script selector
 2. Select "Random ControlNet Input"
 3. Paste the path to a folder with png files in it into the "Image source folder" input box
 4. Enable ControlNet Unit 0 and adjust its settings to your liking. You do not need to select an image for it manually at any point
