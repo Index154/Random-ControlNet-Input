@@ -22,9 +22,63 @@ class Script(scripts.Script):
 
     def run(self, p, uiActive, uiRecursive, uiFolderPath, uiModifyPrompt, uiIgnorePrompt, uiFolderRandom, uiForceControlNet, uiFlip, uiRegex):
     
-        # Abort if the script is inactive
+        # Function for replacing text in string
+        def replaceText(text):
+            for replace in replaces:
+                if(replace is not None):
+                    parts = replace[1:-1].split('=>')
+                    text = text.replace(parts[0], '=>'.join(parts[1:]))
+            return text
+            
+        # Function for txt file reading
+        def readTxt(txtPath):
+            try:
+                with open(txtPath, 'r') as txtFile:
+                    txtContent = txtFile.read().replace('\n', '')
+            except:
+                raise Exception("<Random Controlnet Input> - Failed to read text file " + txtPath)
+            return txtContent
+        
+        # Function for loading default.txt
+        def getDefault(txtPath):
+            splitTxtPath = txtPath.split(separator)
+            mainDefaultPath = os.path.join(uiFolderPath, 'default.txt')
+            
+            loaded = ''
+            index = -1
+            while index < len(splitTxtPath) and loaded == '':
+                path = os.path.join(separator.join(splitTxtPath[:index]), "default.txt")
+                if os.path.isfile(path): loaded = readTxt(path)
+                if path == mainDefaultPath : break
+                index -= 1
+            return loaded
+    
+        # Get substitution strings from prompt and remove them
+        import re
+        pattern = r'!.*?=>.*?!'
+        replaces = re.findall(pattern, p.prompt)
+        p.prompt = re.sub(pattern, '', p.prompt)
+        separator = os.path.join('a', 'a')[1:2]
+        
+        # Get custom weight pools from prompt and remove them
+        pattern = r'!.*?=.*?!'
+        weights = re.findall(pattern, p.prompt)
+        p.prompt = re.sub(pattern, '', p.prompt)
+        folders = []
+        totalWeight = 0
+        for weight in weights:
+            weightSplit = weight[1:-1].split('=')
+            weightSplit[1] = int(weightSplit[1])
+            if weightSplit[1] < 1 : weightSplit[1] = 1
+            totalWeight += weightSplit[1]
+            newWeight = {'name': weightSplit[0], 'value': weightSplit[1], 'images': []}
+            folders.append(newWeight)
+    
+        # Abort if the script is inactive (still do the text replacing anyway)
         if(not uiActive):
-            return
+            p.prompt = replaceText(p.prompt)
+            proc = process_images(p)
+            return proc
         
         # Error if controlnet is missing
         import importlib
@@ -61,27 +115,6 @@ class Script(scripts.Script):
         if(len(files) < 1):
             raise Exception("<Random ControlNet Input> - No PNG files found in image source folder")
             return
-        
-        # Get substitution strings from prompt and remove them
-        import re
-        pattern = r'!.*?=>.*?!'
-        replaces = re.findall(pattern, p.prompt)
-        p.prompt = re.sub(pattern, '', p.prompt)
-        separator = os.path.join('a', 'a')[1:2]
-        
-        # Get custom weight pools from prompt and remove them
-        pattern = r'!.*?=.*?!'
-        weights = re.findall(pattern, p.prompt)
-        p.prompt = re.sub(pattern, '', p.prompt)
-        folders = []
-        totalWeight = 0
-        for weight in weights:
-            weightSplit = weight[1:-1].split('=')
-            weightSplit[1] = int(weightSplit[1])
-            if weightSplit[1] < 1 : weightSplit[1] = 1
-            totalWeight += weightSplit[1]
-            newWeight = {'name': weightSplit[0], 'value': weightSplit[1], 'images': []}
-            folders.append(newWeight)
             
         # Assign every image to a weight pool
         for f in files:
@@ -144,29 +177,6 @@ class Script(scripts.Script):
         except:
             raise Exception("<Random Controlnet Input> - Failed to read image file " + selectedImg)
             return
-            
-        # Function for txt file reading
-        def readTxt(txtPath):
-            try:
-                with open(txtPath, 'r') as txtFile:
-                    txtContent = txtFile.read().replace('\n', '')
-            except:
-                raise Exception("<Random Controlnet Input> - Failed to read text file " + txtPath)
-            return txtContent
-        
-        # Function for loading default.txt
-        def getDefault(txtPath):
-            splitTxtPath = txtPath.split(separator)
-            mainDefaultPath = os.path.join(uiFolderPath, 'default.txt')
-            
-            loaded = ''
-            index = -1
-            while index < len(splitTxtPath) and loaded == '':
-                path = os.path.join(separator.join(splitTxtPath[:index]), "default.txt")
-                if os.path.isfile(path): loaded = readTxt(path)
-                if path == mainDefaultPath : break
-                index -= 1
-            return loaded
         
         # Add text from txt file with same filename to prompt if enabled. If no file is found, look for default.txt in the same folder and in the main folder entered by the user
         if(uiModifyPrompt):
@@ -182,10 +192,7 @@ class Script(scripts.Script):
                 if uiIgnorePrompt : p.prompt = ''
                 p.prompt += loadedTxt
                 if '{default}' in p.prompt : p.prompt = p.prompt.replace('{default}', getDefault(txtPath))  # Replace {default} with contents from default.txt
-                for replace in replaces:
-                    if(replace is not None):
-                        parts = replace[1:-1].split('=>')
-                        p.prompt = p.prompt.replace(parts[0], '=>'.join(parts[1:]))
+                p.prompt = replaceText(p.prompt)
         
         # Change the controlnet input image to the selected one
         controlNetList[0].image = imgData
