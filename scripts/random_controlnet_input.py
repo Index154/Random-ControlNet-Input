@@ -1,7 +1,16 @@
-import modules.scripts as scripts
 import gradio as gr
 import os
+import modules.scripts as scripts
 from modules.processing import process_images, Processed
+from modules.shared import state
+
+import random
+from PIL import Image
+from io import BytesIO
+import base64
+import re
+import importlib
+import glob
 
 class Script(scripts.Script):
 
@@ -54,7 +63,6 @@ class Script(scripts.Script):
             return loaded
     
         # Get substitution strings from prompt and remove them
-        import re
         pattern = r'!.*?=>.*?!'
         replaces = re.findall(pattern, p.prompt)
         p.prompt = re.sub(pattern, '', p.prompt)
@@ -79,9 +87,8 @@ class Script(scripts.Script):
             p.prompt = replaceText(p.prompt)
             proc = process_images(p)
             return proc
-        
-        # Error if controlnet is missing
-        import importlib
+            
+        # Error if ControlNet is missing
         try:
             controlNetModule = importlib.import_module('extensions.sd-webui-controlnet.scripts.external_code', 'external_code')
         except:
@@ -104,7 +111,6 @@ class Script(scripts.Script):
             else: return
         
         # Get list of files in folder
-        import glob
         if(uiRecursive):
             searchPath = os.path.join(uiFolderPath, '**', '*.png')
         else:
@@ -151,7 +157,6 @@ class Script(scripts.Script):
         print('')
         
         # Select a random image
-        import random
         roll = random.randrange(1, totalWeight + 1)
         selectedImg = ''
         weightCheck = 0
@@ -165,9 +170,6 @@ class Script(scripts.Script):
         if selectedImg == '' : raise Exception("<Random Controlnet Input> - The randomization ended without a chosen image even though other checks should have prevented this from happening. Please test the reproducability of this and report the issue")
         
         # Load image
-        from PIL import Image
-        from io import BytesIO
-        import base64
         try:
             with Image.open(selectedImg) as img:
                 if uiFlip and random.choice([True, False]) : img = img.transpose(Image.FLIP_LEFT_RIGHT)
