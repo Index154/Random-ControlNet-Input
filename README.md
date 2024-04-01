@@ -17,7 +17,7 @@ A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/st
 4. Enable ControlNet Unit 0 and adjust its settings to your liking. You do not need to select an image for it manually at any point
 5. When you click "Generate" the script will select a random PNG file from the folder as the ControlNet Unit 0 input (it will not be displayed in the ControlNet UI)
 
-If you increase the batch count then each batch will use a different randomly selected ControlNet input image!
+If you increase the batch count then each batch will use a different randomly selected ControlNet input image! However there is a small bug currently: The metadata displayed in the WebUI after generation finishes will be incorrect except for the first image. Pull the images into the PNG info tab to see the real generation info!
 
 
 ## Extra details and special features
@@ -66,6 +66,7 @@ There is a checkbox you can enable so unit 0 of ControlNet will always be enable
 
 
 ## Known issues & limitations
+- Incorrect parameters are displayed in the generation results
 - For now I have not bothered to add support for multiple ControlNet units or even just selecting a specific unit. I will consider it if anyone asks for it
 - It only looks for and loads PNG files for now because I had no need for other file types
 - The script only reads special syntax from positive prompts for now and only positive prompts can be modified through the TXT files
