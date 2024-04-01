@@ -16,7 +16,7 @@ import glob
 class Script(scripts.Script):
 
     def title(self):
-        return "Random ControlNet Input Batch"
+        return "Random ControlNet Input"
 
     def ui(self, is_img2img):
         uiActive = gr.Checkbox(True, label="Activate script")
