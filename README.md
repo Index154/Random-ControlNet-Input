@@ -1,6 +1,8 @@
 # Random ControlNet Input
 A custom script for [Stable Diffusion WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui). When enabled chooses a random input image for ControlNet unit 0 from a custom folder path every time you start a generation process. With additional features such as dynamic prompt modifications for the positive prompt, randomized flipping of the input image and custom weights for select subfolders or files.
 
+## Compatibility issues
+This script does NOT work with Forge. If you find a way to fix it then please do share it. Unfortunately I couldn't get it to work.
 
 ## Installation
 1. Install the [ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet)
